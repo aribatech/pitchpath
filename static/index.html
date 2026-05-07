@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Internship Finder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="max-w-md mx-auto mt-24 px-4">
+
+  <h1 class="text-xl font-bold mb-2">AI Internship Finder</h1>
+  <p class="text-sm text-gray-500 mb-6">Upload your resume PDF to get started.</p>
+
+  <input type="file" id="file" accept=".pdf" class="block mb-4 text-sm">
+  <button onclick="upload()" id="btn" class="border px-3 py-1 text-sm">Upload Resume</button>
+  <a href="profiles.html" class="border px-3 py-1 text-sm ml-2">View All Profiles</a>
+  <p id="msg" class="mt-3 text-sm text-gray-500"></p>
+
+<script>
+const API = 'http://localhost:8888';
+async function upload() {
+  const file = document.getElementById('file').files[0];
+  if (!file) return alert('Select a PDF.');
+  const btn = document.getElementById('btn');
+  const msg = document.getElementById('msg');
+  btn.disabled = true; btn.textContent = 'Uploading...';
+  msg.textContent = 'Parsing resume with AI...';
+  try {
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${API}/resume/upload`, { method: 'POST', body: form });
+    if (!res.ok) { const e = await res.json().catch(()=>({detail:'Upload failed'})); throw new Error(e.detail); }
+    const data = await res.json();
+    localStorage.setItem('profile_id', data.id);
+    localStorage.setItem('profile', JSON.stringify(data));
+    localStorage.setItem('keywords', JSON.stringify(data.keywords || []));
+    location.href = 'profile.html';
+  } catch(e) {
+    msg.textContent = e.message;
+    msg.className = 'mt-3 text-sm text-red-500';
+    btn.disabled = false; btn.textContent = 'Upload Resume';
+  }
+}
+</script>
+</body>
+</html>
