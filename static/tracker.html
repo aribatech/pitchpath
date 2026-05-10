@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="max-w-lg mx-auto mt-16 px-4">
+
+  <div class="flex gap-4 text-sm mb-6">
+    <a href="profile.html">Profile</a>
+    <a href="jobs.html">Jobs</a>
+  </div>
+
+  <h1 class="text-xl font-bold mb-1">Application Tracker</h1>
+  <p id="sub" class="text-sm text-gray-500 mb-8">Loading...</p>
+
+  <div id="apps"></div>
+
+<script>
+const API = 'http://localhost:8888';
+const pid = localStorage.getItem('profile_id');
+if (!pid) location.href = 'index.html';
+
+const STATUSES = ['applied','interview','offer','rejected','no_reply'];
+
+async function load() {
+  const res = await fetch(`${API}/tracker/${pid}`);
+  const data = await res.json();
+  const apps = data.applications || [];
+  document.getElementById('sub').textContent = `${apps.length} application${apps.length !== 1 ? 's' : ''}`;
+  const el = document.getElementById('apps');
+  el.innerHTML = '';
+
+  if (!apps.length) {
+    el.innerHTML = '<p class="text-sm text-gray-400">No applications yet. Go to Jobs, click View, then Apply and Track.</p>';
+    return;
+  }
+
+  apps.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'mb-10';
+    div.innerHTML = `
+      <p class="font-bold">${a.role} at ${a.company}</p>
+      <p class="text-xs text-gray-400 mb-4">Applied ${new Date(a.applied_at).toLocaleDateString()} | Status: ${a.status.replace('_',' ')}</p>
+
+      ${a.linkedin_message ? `<p class="text-xs text-gray-400 mb-1">LinkedIn Message</p><textarea rows="4" readonly class="w-full border px-2 py-1 text-sm mb-4">${a.linkedin_message}</textarea>` : ''}
+      ${a.whatsapp_message ? `<p class="text-xs text-gray-400 mb-1">WhatsApp Message</p><textarea rows="3" readonly class="w-full border px-2 py-1 text-sm mb-4">${a.whatsapp_message}</textarea>` : ''}
+
+      <p class="text-xs text-gray-400 mb-1">Status</p>
+      <select id="s-${a.id}" class="border px-2 py-1 text-sm mb-3">
+        ${STATUSES.map(s=>`<option value="${s}" ${s===a.status?'selected':''}>${s.replace('_',' ')}</option>`).join('')}
+      </select>
+
+      <p class="text-xs text-gray-400 mb-1">Note</p>
+      <input id="n-${a.id}" value="${a.notes||''}" placeholder="Add a note..." class="w-full border px-2 py-1 text-sm mb-3">
+
+      <button onclick="update('${a.id}')" class="border px-3 py-1 text-sm">Save</button>
+      <button onclick="del('${a.id}')" class="border px-3 py-1 text-sm ml-2">Delete</button>
+      <hr class="mt-8">`;
+    el.appendChild(div);
+  });
+}
+
+async function update(id) {
+  await fetch(`${API}/tracker/${id}/status`, {
+    method: 'PATCH',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ status: document.getElementById(`s-${id}`).value, notes: document.getElementById(`n-${id}`).value })
+  });
+  load();
+}
+
+async function del(id) {
+  if (!confirm('Delete?')) return;
+  await fetch(`${API}/tracker/${id}`, { method: 'DELETE' });
+  load();
+}
+
+load();
+</script>
+</body>
+</html>
