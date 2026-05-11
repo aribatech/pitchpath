@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Profiles</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="max-w-xl mx-auto mt-16 px-4">
+
+  <a href="index.html" class="text-sm">Back</a>
+  <h1 class="text-xl font-bold mt-4 mb-6">All Profiles</h1>
+
+  <div id="list" class="text-sm text-gray-400">Loading...</div>
+
+<script>
+  var API = 'http://localhost:8888';
+
+  fetch(API + '/resume/all')
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var el = document.getElementById('list');
+      var profiles = data.profiles || [];
+
+      if (profiles.length === 0) {
+        el.textContent = 'No profiles yet.';
+        return;
+      }
+
+      el.innerHTML = '';
+      for (var i = 0; i < profiles.length; i++) {
+        var p = profiles[i];
+        var date = p.created_at ? new Date(p.created_at).toLocaleString() : '-';
+
+        var div = document.createElement('div');
+        div.className = 'border-b py-3 flex justify-between items-center';
+        div.innerHTML =
+          '<div>' +
+            '<p class="font-medium text-gray-800">' + (p.name || 'Unknown') + '</p>' +
+            '<p class="text-xs text-gray-400">' + (p.email || '') + '</p>' +
+            '<p class="text-xs text-gray-400">' + date + '</p>' +
+          '</div>' +
+          '<button class="border px-3 py-1 text-sm" onclick="open(\'' + p.id + '\')">Open</button>';
+
+        el.appendChild(div);
+      }
+    })
+    .catch(function() {
+      document.getElementById('list').textContent = 'Failed to load profiles.';
+    });
+
+  function open(id) {
+    fetch(API + '/resume/' + id)
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        localStorage.setItem('profile_id', data.id);
+        localStorage.setItem('profile', JSON.stringify(data));
+        localStorage.setItem('keywords', JSON.stringify(data.keywords || []));
+        location.href = 'profile.html';
+      })
+      .catch(function() {
+        alert('Failed to load profile.');
+      });
+  }
+</script>
+</body>
+</html>
