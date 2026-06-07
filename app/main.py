@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="AI Internship Finder",
+    title="PitchPath",
     description="Multi-agent pipeline: upload resume → match internships → outreach + track applications",
     version="1.0.0",
     lifespan=lifespan,
@@ -38,7 +38,7 @@ app.include_router(tracker.router)
 
 @app.get("/health", tags=["Health"])
 async def health():
-    return {"status": "ok", "service": "AI Internship Finder"}
+    return {"status": "ok", "service": "PitchPath"}
 
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
