@@ -18,7 +18,7 @@
   <div id="apps"></div>
 
 <script>
-const API = 'http://localhost:8888';
+const API = window.location.hostname === 'localhost' ? 'http://localhost:8888' : '';
 const pid = localStorage.getItem('profile_id');
 if (!pid) location.href = 'index.html';
 

@@ -38,7 +38,7 @@
   </div>
 
 <script>
-  var API = 'http://localhost:8888';
+  var API = window.location.hostname === 'localhost' ? 'http://localhost:8888' : '';
   var matches = JSON.parse(localStorage.getItem('matches') || '[]');
   var pid = localStorage.getItem('profile_id');
   var currentMatch = null;

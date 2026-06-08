@@ -13,7 +13,7 @@
   <div id="list" class="text-sm text-gray-400">Loading...</div>
 
 <script>
-  var API = 'http://localhost:8888';
+  var API = window.location.hostname === 'localhost' ? 'http://localhost:8888' : '';
 
   fetch(API + '/resume/all')
     .then(function(res) { return res.json(); })
