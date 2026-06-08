@@ -1,22 +1,17 @@
-import os
-import chromadb
-from chromadb.config import Settings as ChromaSettings
+from pinecone import Pinecone
 from langchain_openai import OpenAIEmbeddings
 from app.db.mongo import settings
 
-_client: chromadb.ClientAPI | None = None
+_index = None
 _embeddings: OpenAIEmbeddings | None = None
 
 
-def get_chroma_client() -> chromadb.ClientAPI:
-    global _client
-    if _client is None:
-        path = "/tmp/chroma_db" if os.environ.get("VERCEL") else settings.chroma_persist_dir
-        _client = chromadb.PersistentClient(
-            path=path,
-            settings=ChromaSettings(anonymized_telemetry=False),
-        )
-    return _client
+def get_index():
+    global _index
+    if _index is None:
+        pc = Pinecone(api_key=settings.pinecone_api_key)
+        _index = pc.Index(settings.pinecone_index)
+    return _index
 
 
 def get_embeddings() -> OpenAIEmbeddings:
@@ -30,50 +25,30 @@ def get_embeddings() -> OpenAIEmbeddings:
 
 
 async def upsert_profile_embedding(profile_id: str, text: str) -> None:
-    client = get_chroma_client()
-    emb = get_embeddings()
-    collection = client.get_or_create_collection("profiles")
-    vector = emb.embed_query(text)
-    collection.upsert(
-        ids=[profile_id],
-        embeddings=[vector],
-        metadatas=[{"profile_id": profile_id}],
-        documents=[text],
+    vector = get_embeddings().embed_query(text)
+    get_index().upsert(
+        vectors=[{"id": profile_id, "values": vector, "metadata": {"profile_id": profile_id}}],
+        namespace="profiles",
     )
 
 
 async def upsert_job_embedding(job_id: str, text: str) -> None:
-    client = get_chroma_client()
-    emb = get_embeddings()
-    collection = client.get_or_create_collection("jobs")
-    vector = emb.embed_query(text)
-    collection.upsert(
-        ids=[job_id],
-        embeddings=[vector],
-        metadatas=[{"job_id": job_id}],
-        documents=[text],
+    vector = get_embeddings().embed_query(text)
+    get_index().upsert(
+        vectors=[{"id": job_id, "values": vector, "metadata": {"job_id": job_id}}],
+        namespace="jobs",
     )
 
 
 async def get_profile_embedding(profile_id: str) -> list[float] | None:
-    client = get_chroma_client()
-    collection = client.get_or_create_collection("profiles")
-    result = collection.get(ids=[profile_id], include=["embeddings"])
-    embs = result.get("embeddings")
-    if embs is not None and len(embs) > 0:
-        e = embs[0]
-        return e.tolist() if hasattr(e, "tolist") else list(e)
+    result = get_index().fetch(ids=[profile_id], namespace="profiles")
+    vectors = result.get("vectors") or {}
+    if profile_id in vectors:
+        return vectors[profile_id]["values"]
     return None
 
 
 async def get_job_embeddings_for_jobs(job_ids: list[str]) -> dict[str, list[float]]:
-    client = get_chroma_client()
-    collection = client.get_or_create_collection("jobs")
-    result = collection.get(ids=job_ids, include=["embeddings"])
-    out = {}
-    embs = result.get("embeddings")
-    if embs is None:
-        return out
-    for jid, emb in zip(result["ids"], embs):
-        out[jid] = emb.tolist() if hasattr(emb, "tolist") else list(emb)
-    return out
+    result = get_index().fetch(ids=job_ids, namespace="jobs")
+    vectors = result.get("vectors") or {}
+    return {jid: vectors[jid]["values"] for jid in job_ids if jid in vectors}

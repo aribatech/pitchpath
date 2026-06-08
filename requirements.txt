@@ -3,24 +3,14 @@ uvicorn[standard]==0.32.1
 python-multipart==0.0.12
 pydantic==2.10.3
 pydantic-settings==2.6.1
-
-# Database
 motor==3.6.0
 redis[asyncio]==5.2.1
-
-# AI / Agents
 langchain==0.3.13
 langchain-openai==0.2.14
 langchain-community==0.3.13
 openai==1.58.1
-chromadb==0.5.23
+pinecone==5.4.2
 tiktoken==0.8.0
-
-# PDF
 pdfplumber==0.11.4
-
-# HTTP
 httpx==0.28.1
-
-# Utils
 python-dotenv==1.0.1

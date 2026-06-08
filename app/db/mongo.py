@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     mongodb_url: str = "mongodb://localhost:27017"
     redis_url: str = "redis://localhost:6379"
     rapidapi_key: str = ""
-    chroma_persist_dir: str = "./chroma_db"
+    pinecone_api_key: str = ""
+    pinecone_index: str = "pitchpath"
     db_name: str = "internship_agent"
 
     class Config:
