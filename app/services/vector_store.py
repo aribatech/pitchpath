@@ -1,3 +1,4 @@
+import os
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from langchain_openai import OpenAIEmbeddings
@@ -10,8 +11,9 @@ _embeddings: OpenAIEmbeddings | None = None
 def get_chroma_client() -> chromadb.ClientAPI:
     global _client
     if _client is None:
+        path = "/tmp/chroma_db" if os.environ.get("VERCEL") else settings.chroma_persist_dir
         _client = chromadb.PersistentClient(
-            path=settings.chroma_persist_dir,
+            path=path,
             settings=ChromaSettings(anonymized_telemetry=False),
         )
     return _client
