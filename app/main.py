@@ -4,17 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.db.mongo import connect_mongo, close_mongo
-from app.db.redis import connect_redis, close_redis
 from app.api import resume, jobs, tracker
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_mongo()
-    await connect_redis()
     yield
     await close_mongo()
-    await close_redis()
 
 
 app = FastAPI(

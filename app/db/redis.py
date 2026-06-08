@@ -1,22 +1,11 @@
-import redis.asyncio as aioredis
+from upstash_redis.asyncio import Redis
 from app.db.mongo import settings
 
-_redis: aioredis.Redis | None = None
+_redis: Redis | None = None
 
 
-async def connect_redis():
+def get_redis() -> Redis:
     global _redis
-    _redis = aioredis.from_url(settings.redis_url, decode_responses=True)
-
-
-async def close_redis():
-    global _redis
-    if _redis:
-        await _redis.aclose()
-        _redis = None
-
-
-def get_redis() -> aioredis.Redis:
     if _redis is None:
-        raise RuntimeError("Redis not connected")
+        _redis = Redis(url=settings.upstash_redis_url, token=settings.upstash_redis_token)
     return _redis

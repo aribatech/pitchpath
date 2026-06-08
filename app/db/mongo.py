@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     rapidapi_key: str = ""
     pinecone_api_key: str = ""
     pinecone_index: str = "pitchpath"
+    upstash_redis_url: str = ""
+    upstash_redis_token: str = ""
     db_name: str = "internship_agent"
 
     class Config:
