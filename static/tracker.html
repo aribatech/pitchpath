@@ -2,27 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tracker</title>
+  <title>Tracker - PitchPath</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="max-w-lg mx-auto mt-16 px-4">
+<body class="bg-gray-50 min-h-screen px-4 py-10">
+  <div class="max-w-xl mx-auto">
 
-  <div class="flex gap-4 text-sm mb-6">
-    <a href="profile.html">Profile</a>
-    <a href="jobs.html">Jobs</a>
+    <div class="flex items-center justify-between mb-8">
+      <a href="jobs.html" class="text-indigo-600 text-sm font-medium">- Jobs</a>
+      <a href="profile.html" class="text-sm text-gray-500 hover:text-gray-700">Profile</a>
+    </div>
+
+    <div class="mb-6">
+      <h1 class="text-xl font-bold text-gray-800">Application Tracker</h1>
+      <p id="sub" class="text-sm text-gray-500 mt-1">Loading...</p>
+    </div>
+
+    <div id="apps"></div>
+
   </div>
-
-  <h1 class="text-xl font-bold mb-1">Application Tracker</h1>
-  <p id="sub" class="text-sm text-gray-500 mb-8">Loading...</p>
-
-  <div id="apps"></div>
-
 <script>
 const API = window.location.hostname === 'localhost' ? 'http://localhost:8888' : '';
 const pid = localStorage.getItem('profile_id');
 if (!pid) location.href = 'index.html';
 
 const STATUSES = ['applied','interview','offer','rejected','no_reply'];
+
+const STATUS_COLORS = {
+  applied: 'bg-blue-50 text-blue-600',
+  interview: 'bg-yellow-50 text-yellow-600',
+  offer: 'bg-green-50 text-green-600',
+  rejected: 'bg-red-50 text-red-500',
+  no_reply: 'bg-gray-100 text-gray-500',
+};
 
 async function load() {
   const res = await fetch(`${API}/tracker/${pid}`);
@@ -33,31 +45,36 @@ async function load() {
   el.innerHTML = '';
 
   if (!apps.length) {
-    el.innerHTML = '<p class="text-sm text-gray-400">No applications yet. Go to Jobs, click View, then Apply and Track.</p>';
+    el.innerHTML = '<div class="bg-white border border-gray-200 rounded-lg p-6 text-sm text-gray-400">No applications yet. Go to Jobs, click View, then Apply and Track.</div>';
     return;
   }
 
   apps.forEach(a => {
+    const colorClass = STATUS_COLORS[a.status] || 'bg-gray-100 text-gray-500';
     const div = document.createElement('div');
-    div.className = 'mb-10';
+    div.className = 'bg-white border border-gray-200 rounded-lg p-5 mb-4';
     div.innerHTML = `
-      <p class="font-bold">${a.role} at ${a.company}</p>
-      <p class="text-xs text-gray-400 mb-4">Applied ${new Date(a.applied_at).toLocaleDateString()} | Status: ${a.status.replace('_',' ')}</p>
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <p class="font-semibold text-gray-800">${a.role}</p>
+          <p class="text-sm text-gray-500">${a.company}</p>
+          <p class="text-xs text-gray-400 mt-1">Applied ${new Date(a.applied_at).toLocaleDateString()}</p>
+        </div>
+        <span class="text-xs px-2 py-1 rounded font-medium ${colorClass}">${a.status.replace('_',' ')}</span>
+      </div>
 
-      ${a.linkedin_message ? `<p class="text-xs text-gray-400 mb-1">LinkedIn Message</p><textarea rows="4" readonly class="w-full border px-2 py-1 text-sm mb-4">${a.linkedin_message}</textarea>` : ''}
-      ${a.whatsapp_message ? `<p class="text-xs text-gray-400 mb-1">WhatsApp Message</p><textarea rows="3" readonly class="w-full border px-2 py-1 text-sm mb-4">${a.whatsapp_message}</textarea>` : ''}
-
-      <p class="text-xs text-gray-400 mb-1">Status</p>
-      <select id="s-${a.id}" class="border px-2 py-1 text-sm mb-3">
+      <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+      <select id="s-${a.id}" class="border border-gray-300 rounded px-3 py-1.5 text-sm mb-3 w-full focus:outline-none focus:border-indigo-400">
         ${STATUSES.map(s=>`<option value="${s}" ${s===a.status?'selected':''}>${s.replace('_',' ')}</option>`).join('')}
       </select>
 
-      <p class="text-xs text-gray-400 mb-1">Note</p>
-      <input id="n-${a.id}" value="${a.notes||''}" placeholder="Add a note..." class="w-full border px-2 py-1 text-sm mb-3">
+      <label class="block text-xs font-medium text-gray-500 mb-1">Note</label>
+      <input id="n-${a.id}" value="${a.notes||''}" placeholder="Add a note..." class="border border-gray-300 rounded px-3 py-1.5 text-sm mb-4 w-full focus:outline-none focus:border-indigo-400">
 
-      <button onclick="update('${a.id}')" class="border px-3 py-1 text-sm">Save</button>
-      <button onclick="del('${a.id}')" class="border px-3 py-1 text-sm ml-2">Delete</button>
-      <hr class="mt-8">`;
+      <div class="flex gap-2">
+        <button onclick="update('${a.id}')" class="bg-indigo-600 text-white px-4 py-1.5 text-xs rounded hover:bg-indigo-700">Save</button>
+        <button onclick="del('${a.id}')" class="border border-gray-300 text-gray-500 px-4 py-1.5 text-xs rounded hover:bg-gray-50">Delete</button>
+      </div>`;
     el.appendChild(div);
   });
 }
