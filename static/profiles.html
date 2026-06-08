@@ -5,18 +5,13 @@
   <title>Profiles - PitchPath</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen px-4 py-10">
-  <div class="max-w-xl mx-auto">
+<body class="max-w-xl mx-auto mt-12 px-4 pb-16">
 
-    <div class="mb-8">
-      <a href="index.html" class="text-indigo-600 text-sm font-medium">- PitchPath</a>
-    </div>
+  <a href="index.html" class="text-sm text-gray-500">← PitchPath</a>
+  <h1 class="text-xl font-bold mt-6 mb-8">All Profiles</h1>
 
-    <h1 class="text-xl font-bold text-gray-800 mb-6">All Profiles</h1>
+  <div id="list" class="text-sm text-gray-400">Loading...</div>
 
-    <div id="list" class="text-sm text-gray-400">Loading...</div>
-
-  </div>
 <script>
   var API = window.location.hostname === 'localhost' ? 'http://localhost:8888' : '';
 
@@ -25,33 +20,24 @@
     .then(function(data) {
       var el = document.getElementById('list');
       var profiles = data.profiles || [];
-
-      if (profiles.length === 0) {
-        el.innerHTML = '<div class="bg-white border border-gray-200 rounded-lg p-6 text-gray-400">No profiles yet.</div>';
-        return;
-      }
-
+      if (profiles.length === 0) { el.textContent = 'No profiles yet.'; return; }
       el.innerHTML = '';
       for (var i = 0; i < profiles.length; i++) {
         var p = profiles[i];
         var date = p.created_at ? new Date(p.created_at).toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' }) : '-';
-
         var div = document.createElement('div');
-        div.className = 'bg-white border border-gray-200 rounded-lg px-5 py-4 mb-3 flex justify-between items-center';
+        div.className = 'border-t border-gray-200 py-4 flex justify-between items-center';
         div.innerHTML =
           '<div>' +
             '<p class="font-medium text-gray-800">' + (p.name || 'Unknown') + '</p>' +
             '<p class="text-xs text-gray-400 mt-0.5">' + (p.email || '') + '</p>' +
             '<p class="text-xs text-gray-400">' + date + '</p>' +
           '</div>' +
-          '<button class="border border-gray-300 px-4 py-1.5 text-xs rounded hover:border-indigo-400 hover:text-indigo-600" onclick="openProfile(\'' + p.id + '\')">Open</button>';
-
+          '<button class="border border-gray-300 px-4 py-1.5 text-xs text-gray-600" onclick="openProfile(\'' + p.id + '\')">Open</button>';
         el.appendChild(div);
       }
     })
-    .catch(function() {
-      document.getElementById('list').textContent = 'Failed to load profiles.';
-    });
+    .catch(function() { document.getElementById('list').textContent = 'Failed to load.'; });
 
   function openProfile(id) {
     fetch(API + '/resume/' + id)
@@ -62,9 +48,7 @@
         localStorage.setItem('keywords', JSON.stringify(data.keywords || []));
         location.href = 'profile.html';
       })
-      .catch(function() {
-        alert('Failed to load profile.');
-      });
+      .catch(function() { alert('Failed to load profile.'); });
   }
 </script>
 </body>

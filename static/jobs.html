@@ -5,42 +5,35 @@
   <title>Jobs - PitchPath</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen px-4 py-10">
-  <div class="max-w-3xl mx-auto">
+<body class="max-w-3xl mx-auto mt-12 px-4 pb-16">
 
-    <div class="flex items-center justify-between mb-8">
-      <a href="profile.html" class="text-indigo-600 text-sm font-medium">- Back</a>
-      <a href="tracker.html" class="text-sm text-gray-500 hover:text-gray-700">Tracker</a>
-    </div>
-
-    <div class="mb-6">
-      <h1 class="text-xl font-bold text-gray-800">Matched Internships</h1>
-      <p id="sub" class="text-sm text-gray-500 mt-1"></p>
-    </div>
-
-    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase w-16">Score</th>
-            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase">Role</th>
-            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase">Company</th>
-            <th class="px-4 py-3"></th>
-          </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
-
+  <div class="flex justify-between items-center mb-8">
+    <a href="profile.html" class="text-sm text-gray-500">← Back</a>
+    <a href="tracker.html" class="text-sm text-gray-500">Tracker →</a>
   </div>
 
-  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4 z-50">
-    <div class="bg-white rounded-lg w-full max-w-lg max-h-screen overflow-y-auto p-6">
-      <h2 id="modal-title" class="text-lg font-bold text-gray-800 mb-5"></h2>
+  <h1 class="text-xl font-bold mb-1">Matched Internships</h1>
+  <p id="sub" class="text-sm text-gray-500 mb-6"></p>
+
+  <table class="w-full text-sm border-collapse">
+    <thead>
+      <tr class="border-b border-gray-200">
+        <th class="text-left py-2 text-xs text-gray-400 uppercase tracking-wider w-16">Score</th>
+        <th class="text-left py-2 text-xs text-gray-400 uppercase tracking-wider">Role</th>
+        <th class="text-left py-2 text-xs text-gray-400 uppercase tracking-wider">Company</th>
+        <th class="py-2"></th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center px-4 z-50">
+    <div class="bg-white w-full max-w-lg max-h-screen overflow-y-auto p-6 border border-gray-200">
+      <h2 id="modal-title" class="text-base font-bold mb-5"></h2>
       <div id="modal-body" class="text-sm mb-6"></div>
       <div class="flex gap-3">
-        <button onclick="applyJob()" class="bg-indigo-600 text-white px-5 py-2 text-sm rounded hover:bg-indigo-700">Apply and Track</button>
-        <button onclick="closeModal()" class="border border-gray-300 text-gray-600 px-5 py-2 text-sm rounded hover:bg-gray-50">Close</button>
+        <button onclick="applyJob()" class="bg-black text-white px-5 py-2 text-sm">Apply and Track</button>
+        <button onclick="closeModal()" class="border border-gray-300 text-gray-600 px-5 py-2 text-sm">Close</button>
       </div>
       <p id="modal-msg" class="mt-3 text-sm text-gray-500"></p>
     </div>
@@ -58,13 +51,13 @@
   for (var i = 0; i < matches.length; i++) {
     var m = matches[i];
     var tr = document.createElement('tr');
-    tr.className = 'border-b border-gray-100 hover:bg-gray-50';
-    var applyLink = m.apply_url ? '<a href="' + m.apply_url + '" target="_blank" class="text-xs text-indigo-500 hover:underline ml-3">Job Link</a>' : '';
+    tr.className = 'border-b border-gray-100';
+    var applyLink = m.apply_url ? '<a href="' + m.apply_url + '" target="_blank" class="text-xs text-gray-400 underline ml-3">Link</a>' : '';
     tr.innerHTML =
-      '<td class="px-4 py-3 font-bold text-indigo-600">' + m.match_score + '</td>' +
-      '<td class="px-4 py-3 font-medium text-gray-800">' + m.job_title + '</td>' +
-      '<td class="px-4 py-3 text-gray-500">' + m.company + '</td>' +
-      '<td class="px-4 py-3 whitespace-nowrap text-right"><button class="border border-gray-300 px-3 py-1 text-xs rounded hover:border-indigo-400 hover:text-indigo-600" onclick="openModal(' + i + ')">View</button>' + applyLink + '</td>';
+      '<td class="py-3 font-bold">' + m.match_score + '</td>' +
+      '<td class="py-3 font-medium">' + m.job_title + '</td>' +
+      '<td class="py-3 text-gray-500">' + m.company + '</td>' +
+      '<td class="py-3 whitespace-nowrap text-right"><button class="border border-gray-300 px-3 py-1 text-xs" onclick="openModal(' + i + ')">View</button>' + applyLink + '</td>';
     tbody.appendChild(tr);
   }
 
@@ -80,25 +73,25 @@
       .then(function(data) {
         var html = '';
 
-        html += '<p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Matching Skills</p>';
+        html += '<p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Matching Skills</p>';
         html += '<div class="flex flex-wrap gap-2 mb-4">';
         for (var i = 0; i < (data.matching_skills || []).length; i++) {
-          html += '<span class="border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs rounded text-gray-700">' + data.matching_skills[i] + '</span>';
+          html += '<span class="border border-gray-300 px-2 py-0.5 text-xs text-gray-700">' + data.matching_skills[i] + '</span>';
         }
         html += '</div>';
 
-        html += '<p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Missing Skills</p>';
+        html += '<p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Missing Skills</p>';
         html += '<div class="flex flex-wrap gap-2 mb-4">';
         for (var j = 0; j < (data.missing_skills || []).length; j++) {
-          html += '<span class="border border-red-200 bg-red-50 px-2 py-0.5 text-xs rounded text-red-500">' + data.missing_skills[j] + '</span>';
+          html += '<span class="border border-gray-300 px-2 py-0.5 text-xs text-gray-400">' + data.missing_skills[j] + '</span>';
         }
         html += '</div>';
 
-        html += '<p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Recommendation</p>';
+        html += '<p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Recommendation</p>';
         html += '<p class="text-sm text-gray-600 leading-relaxed">' + (data.recommendation || '-') + '</p>';
 
         if (currentMatch.apply_url) {
-          html += '<a href="' + currentMatch.apply_url + '" target="_blank" class="inline-block mt-4 text-sm text-indigo-500 hover:underline">Open job posting -</a>';
+          html += '<a href="' + currentMatch.apply_url + '" target="_blank" class="inline-block mt-4 text-sm underline text-gray-500">Open job posting →</a>';
         }
 
         document.getElementById('modal-body').innerHTML = html;
@@ -125,9 +118,7 @@
       if (res.ok) { location.href = 'tracker.html'; }
       else { document.getElementById('modal-msg').textContent = 'Something went wrong.'; }
     })
-    .catch(function() {
-      document.getElementById('modal-msg').textContent = 'Something went wrong.';
-    });
+    .catch(function() { document.getElementById('modal-msg').textContent = 'Something went wrong.'; });
   }
 </script>
 </body>

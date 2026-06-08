@@ -5,36 +5,24 @@
   <title>Tracker - PitchPath</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen px-4 py-10">
-  <div class="max-w-xl mx-auto">
+<body class="max-w-xl mx-auto mt-12 px-4 pb-16">
 
-    <div class="flex items-center justify-between mb-8">
-      <a href="jobs.html" class="text-indigo-600 text-sm font-medium">- Jobs</a>
-      <a href="profile.html" class="text-sm text-gray-500 hover:text-gray-700">Profile</a>
-    </div>
-
-    <div class="mb-6">
-      <h1 class="text-xl font-bold text-gray-800">Application Tracker</h1>
-      <p id="sub" class="text-sm text-gray-500 mt-1">Loading...</p>
-    </div>
-
-    <div id="apps"></div>
-
+  <div class="flex justify-between items-center mb-8">
+    <a href="jobs.html" class="text-sm text-gray-500">← Jobs</a>
+    <a href="profile.html" class="text-sm text-gray-500">Profile</a>
   </div>
+
+  <h1 class="text-xl font-bold mb-1">Application Tracker</h1>
+  <p id="sub" class="text-sm text-gray-500 mb-8">Loading...</p>
+
+  <div id="apps"></div>
+
 <script>
 const API = window.location.hostname === 'localhost' ? 'http://localhost:8888' : '';
 const pid = localStorage.getItem('profile_id');
 if (!pid) location.href = 'index.html';
 
 const STATUSES = ['applied','interview','offer','rejected','no_reply'];
-
-const STATUS_COLORS = {
-  applied: 'bg-blue-50 text-blue-600',
-  interview: 'bg-yellow-50 text-yellow-600',
-  offer: 'bg-green-50 text-green-600',
-  rejected: 'bg-red-50 text-red-500',
-  no_reply: 'bg-gray-100 text-gray-500',
-};
 
 async function load() {
   const res = await fetch(`${API}/tracker/${pid}`);
@@ -45,35 +33,34 @@ async function load() {
   el.innerHTML = '';
 
   if (!apps.length) {
-    el.innerHTML = '<div class="bg-white border border-gray-200 rounded-lg p-6 text-sm text-gray-400">No applications yet. Go to Jobs, click View, then Apply and Track.</div>';
+    el.innerHTML = '<p class="text-sm text-gray-400">No applications yet.</p>';
     return;
   }
 
   apps.forEach(a => {
-    const colorClass = STATUS_COLORS[a.status] || 'bg-gray-100 text-gray-500';
     const div = document.createElement('div');
-    div.className = 'bg-white border border-gray-200 rounded-lg p-5 mb-4';
+    div.className = 'border-t border-gray-200 py-6';
     div.innerHTML = `
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="font-semibold text-gray-800">${a.role}</p>
+          <p class="font-semibold">${a.role}</p>
           <p class="text-sm text-gray-500">${a.company}</p>
-          <p class="text-xs text-gray-400 mt-1">Applied ${new Date(a.applied_at).toLocaleDateString()}</p>
+          <p class="text-xs text-gray-400 mt-1">${new Date(a.applied_at).toLocaleDateString()}</p>
         </div>
-        <span class="text-xs px-2 py-1 rounded font-medium ${colorClass}">${a.status.replace('_',' ')}</span>
+        <span class="text-xs text-gray-400 border border-gray-200 px-2 py-0.5">${a.status.replace('_',' ')}</span>
       </div>
 
-      <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
-      <select id="s-${a.id}" class="border border-gray-300 rounded px-3 py-1.5 text-sm mb-3 w-full focus:outline-none focus:border-indigo-400">
+      <label class="block text-xs text-gray-400 mb-1">Status</label>
+      <select id="s-${a.id}" class="border border-gray-300 px-3 py-1.5 text-sm mb-3 w-full">
         ${STATUSES.map(s=>`<option value="${s}" ${s===a.status?'selected':''}>${s.replace('_',' ')}</option>`).join('')}
       </select>
 
-      <label class="block text-xs font-medium text-gray-500 mb-1">Note</label>
-      <input id="n-${a.id}" value="${a.notes||''}" placeholder="Add a note..." class="border border-gray-300 rounded px-3 py-1.5 text-sm mb-4 w-full focus:outline-none focus:border-indigo-400">
+      <label class="block text-xs text-gray-400 mb-1">Note</label>
+      <input id="n-${a.id}" value="${a.notes||''}" placeholder="Add a note..." class="border border-gray-300 px-3 py-1.5 text-sm mb-4 w-full">
 
       <div class="flex gap-2">
-        <button onclick="update('${a.id}')" class="bg-indigo-600 text-white px-4 py-1.5 text-xs rounded hover:bg-indigo-700">Save</button>
-        <button onclick="del('${a.id}')" class="border border-gray-300 text-gray-500 px-4 py-1.5 text-xs rounded hover:bg-gray-50">Delete</button>
+        <button onclick="update('${a.id}')" class="bg-black text-white px-4 py-1.5 text-xs">Save</button>
+        <button onclick="del('${a.id}')" class="border border-gray-300 text-gray-500 px-4 py-1.5 text-xs">Delete</button>
       </div>`;
     el.appendChild(div);
   });

@@ -5,55 +5,39 @@
   <title>Profile - PitchPath</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen px-4 py-10">
-  <div class="max-w-xl mx-auto">
+<body class="max-w-lg mx-auto mt-12 px-4 pb-16">
 
-    <div class="flex items-center gap-3 mb-8">
-      <a href="index.html" class="text-indigo-600 text-sm font-medium">- PitchPath</a>
-    </div>
+  <a href="index.html" class="text-sm text-gray-500">← PitchPath</a>
 
-    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-4">
-      <h1 id="name" class="text-xl font-bold text-gray-800 mb-1">-</h1>
-      <p id="contact" class="text-sm text-gray-500">-</p>
-    </div>
+  <h1 id="name" class="text-2xl font-bold mt-6 mb-1">-</h1>
+  <p id="contact" class="text-sm text-gray-500 mb-8">-</p>
 
-    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-4">
-      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Skills</p>
-      <div id="skills" class="flex flex-wrap gap-2"></div>
-    </div>
+  <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Skills</p>
+  <div id="skills" class="flex flex-wrap gap-2 mb-8"></div>
 
-    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-4">
-      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Experience</p>
-      <ul id="exp" class="text-sm text-gray-700 space-y-1 list-disc list-inside"></ul>
-    </div>
+  <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Experience</p>
+  <ul id="exp" class="text-sm text-gray-700 space-y-1 list-disc list-inside mb-8"></ul>
 
-    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-4">
-      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Education</p>
-      <ul id="edu" class="text-sm text-gray-700 list-disc list-inside"></ul>
-    </div>
+  <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Education</p>
+  <ul id="edu" class="text-sm text-gray-700 list-disc list-inside mb-8"></ul>
 
-    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Summary</p>
-      <p id="summary" class="text-sm text-gray-600 leading-relaxed">-</p>
-    </div>
+  <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Summary</p>
+  <p id="summary" class="text-sm text-gray-600 leading-relaxed mb-10">-</p>
 
-    <div class="bg-white border border-gray-200 rounded-lg p-6">
-      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Find Internships</p>
+  <hr class="border-gray-200 mb-8">
 
-      <p class="text-xs text-gray-400 mb-2">AI suggested keywords based on your resume:</p>
-      <div id="suggestions" class="flex flex-wrap gap-2 mb-4"></div>
+  <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">AI Suggested Keywords</p>
+  <div id="suggestions" class="flex flex-wrap gap-2 mb-4"></div>
 
-      <label class="block text-xs font-medium text-gray-600 mb-1">Keyword</label>
-      <input id="keyword" placeholder="Pick one above or type your own" class="border border-gray-300 rounded px-3 py-2 text-sm mb-4 w-full focus:outline-none focus:border-indigo-400">
+  <label class="block text-xs text-gray-500 mb-1">Keyword</label>
+  <input id="keyword" placeholder="Pick one above or type your own" class="border border-gray-300 px-3 py-2 text-sm mb-4 w-full">
 
-      <label class="block text-xs font-medium text-gray-600 mb-1">Location</label>
-      <input id="location" value="remote" class="border border-gray-300 rounded px-3 py-2 text-sm mb-5 w-full focus:outline-none focus:border-indigo-400">
+  <label class="block text-xs text-gray-500 mb-1">Location</label>
+  <input id="location" value="remote" class="border border-gray-300 px-3 py-2 text-sm mb-6 w-full">
 
-      <button onclick="match()" id="btn" class="bg-indigo-600 text-white px-6 py-2 text-sm rounded hover:bg-indigo-700 w-full">Find Internships</button>
-      <p id="msg" class="mt-3 text-sm text-gray-500"></p>
-    </div>
+  <button onclick="match()" id="btn" class="bg-black text-white px-6 py-2 text-sm w-full">Find Internships</button>
+  <p id="msg" class="mt-3 text-sm text-gray-500"></p>
 
-  </div>
 <script>
 const API = window.location.hostname === 'localhost' ? 'http://localhost:8888' : '';
 const p = JSON.parse(localStorage.getItem('profile') || '{}');
@@ -62,7 +46,7 @@ if (!pid) location.href = 'index.html';
 
 document.getElementById('name').textContent = p.name || '-';
 document.getElementById('contact').textContent = [p.email, p.phone].filter(Boolean).join(' | ');
-document.getElementById('skills').innerHTML = (p.skills || []).map(s => `<span class="border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs rounded text-gray-700">${s}</span>`).join('');
+document.getElementById('skills').innerHTML = (p.skills || []).map(s => `<span class="border border-gray-300 px-2 py-0.5 text-xs text-gray-700">${s}</span>`).join('');
 document.getElementById('exp').innerHTML = (p.experience || []).map(e => `<li>${e.title} at ${e.company} (${e.duration})</li>`).join('') || '<li>-</li>';
 const edu = p.education;
 document.getElementById('edu').innerHTML = edu ? `<li>${edu.degree} - ${edu.institution} (${edu.years})</li>` : '<li>-</li>';
@@ -73,11 +57,11 @@ var el = document.getElementById('suggestions');
 keywords.forEach(function(kw) {
   var btn = document.createElement('button');
   btn.textContent = kw;
-  btn.className = 'border border-gray-300 px-3 py-1 text-xs rounded text-gray-600 hover:border-indigo-400 hover:text-indigo-600';
+  btn.className = 'border border-gray-300 px-3 py-1 text-xs text-gray-600';
   btn.onclick = function() {
     document.getElementById('keyword').value = kw;
-    el.querySelectorAll('button').forEach(function(b) { b.className = 'border border-gray-300 px-3 py-1 text-xs rounded text-gray-600 hover:border-indigo-400 hover:text-indigo-600'; });
-    btn.className = 'border border-indigo-500 px-3 py-1 text-xs rounded text-indigo-600 font-semibold';
+    el.querySelectorAll('button').forEach(function(b) { b.className = 'border border-gray-300 px-3 py-1 text-xs text-gray-600'; });
+    btn.className = 'border border-black px-3 py-1 text-xs font-semibold';
   };
   el.appendChild(btn);
 });
@@ -90,7 +74,7 @@ async function match() {
   if (!keyword) { alert('Please enter a keyword.'); return; }
   if (!loc) { alert('Please enter a location.'); return; }
   btn.disabled = true; btn.textContent = 'Searching...';
-  msg.textContent = 'Fetching jobs and scoring with AI, this takes around 20 seconds...';
+  msg.textContent = 'Fetching jobs and scoring with AI, takes ~20 seconds...';
   msg.className = 'mt-3 text-sm text-gray-500';
   const params = new URLSearchParams({ keyword: keyword, location: loc, top_n: 10 });
   try {
